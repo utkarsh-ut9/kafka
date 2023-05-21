@@ -1,5 +1,5 @@
 
-# WhatsApp Bot (Kafka~)
+# WhatsApp Bot (Kafka~) [UNDER-DEVELOPMENT | DO NOT CLONE YET]
 
 Kafka is a stellaron hunter and a part time WhatsApp Bot~
 
