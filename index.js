@@ -42,7 +42,7 @@ client.on('ready', () => {
     client.sendMessage(config.ownerNum, 'Kafka is active now!') //change your owner number in config.json file
 });
 //handle calls
-let rejectCalls = true; //change to false if don't want to reject calls automatically
+let rejectCalls = true; //change to false if  you don't want to reject calls automatically
 client.on('call', async (call) => {
     console.log('Call received, rejecting. GOTO script to disable', call);
     if (rejectCalls) await call.reject();
@@ -56,5 +56,10 @@ client.on('message_revoke_everyone', async (before) => {
 });
 
 client.on('message', async msg => {
-    console.log(msg.timestamp, msg.from, msg.body);
+    console.log(msg.from, msg.body);
+});
+
+//disconnection
+client.on('disconnected', (reason) => {
+    console.log('Client was logged out', reason);
 });
