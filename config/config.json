@@ -4,5 +4,6 @@
     "timezone": "Asia/Jakarta",
     "groups": true,
     "ownerNum": "917045361304@c.us",
-    "startupMsg": "Long time no see, Astral Express Crew. It's Kafka~"
+    "startupMsg": "Long time no see, Astral Express Crew. It's Kafka~",
+    "prefix": "."
 }
