@@ -1,5 +1,6 @@
 const { Client, LocalAuth, Chat } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
+const fs = require("fs");
 
 const client = new Client({
   restartOnAuthFail: true,
@@ -7,11 +8,12 @@ const client = new Client({
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   },
-  ffmpeg: './ffmpeg.exe',
+  ffmpeg: "./ffmpeg.exe",
   authStrategy: new LocalAuth({ clientId: "client" }),
 });
 
 const config = require("./config/config.json");
+const { isUint16Array } = require("util/types");
 
 client.initialize();
 //generate QR code
@@ -36,7 +38,7 @@ client.on("loading_screen", (percent, message) => {
 client.on("ready", () => {
   console.clear();
   console.log("Started!");
-  client.sendMessage(config.ownerNum, config.startupMsg); //change your owner number in config.json file
+  // client.sendMessage(config.ownerNum, config.startupMsg); //uncomment this line after changing your owner number in config.json file
 });
 //handle calls
 let rejectCalls = true; //change to false if  you don't want to reject calls automatically
@@ -54,33 +56,30 @@ client.on("call", async (call) => {
     }`
   );
 });
-//handle deleted messages
-client.on("message_revoke_everyone", async (before) => {
-  if (before) {
-    client.sendMessage(before.from, before.body);
-  }
-});
+
 //logging the messages on console (not persistent)
 client.on("message", async (msg) => {
   console.log(msg.from, msg.body);
 });
+
+//handle deleted messages
+  client.on("message_revoke_everyone", async (after, before) => {
+    if (before) {
+      client.sendMessage(before.from, before.body);
+    }
+  });
 
 //disconnection
 client.on("disconnected", (reason) => {
   console.log("Client was logged out", reason);
 });
 
-const prefix = config.prefix;
-//switch case for commands
-
 client.on("message", async (message) => {
-//   const isCmd = message.from.startsWith(prefix) ? true : false;
-
-  if (message.body == '.s' || (message.hasQuotedMsg && message.body == '.s')) {
+  if (message.body == ".s") {
     if (
       message.type == "image" ||
-        message.type == "video" ||
-        message.type == "gif"
+      message.type == "video" ||
+      message.type == "gif"
     ) {
       try {
         const media = await message.downloadMedia();
@@ -90,7 +89,39 @@ client.on("message", async (message) => {
           stickerAuthor: config.author, // Sticker Author = Edit in 'config/config.json'
         });
       } catch {
-        client.sendMessage(message.from, "*[❎]* Failed!");
+        message.reply("Failed!");
+      }
+    }
+  }
+
+  //menu (edit the helpMenu.txt file in config folder)
+  if (message.body == ".help") {
+    fs.readFile("config/helpMenu.txt", function (err, data) {
+      if (err) throw err;
+      client.sendMessage(message.from, data.toString());
+    });
+  }
+
+  //spam message
+  if (message.body.startsWith(".spam ")) {
+    // Replies with the same message n number of times
+    n = message.body.slice(6, 8);
+    if (n < 10) {
+      while (n--) {
+          client.sendMessage(message.from, message.body.slice(8));
+      }
+    } else {
+      message.reply("Please enter single digit value");
+    }
+  }
+  //delete messages from bot side
+  if (message.body === ".del") {
+    if (message.hasQuotedMsg) {
+      const quotedMsg = await message.getQuotedMessage();
+      if (quotedMsg.fromMe) {
+        quotedMsg.delete(true);
+      } else {
+        message.reply("I can only delete my own messages");
       }
     }
   }

@@ -1,0 +1,10 @@
+(っ◔◡◔)っ ♥ Kafka Bot~ ♥
+
+<< COMMANDS >>
+
+!! {$prefix} => .
+
+☞ Image to Sticker : Reply image with {$prefix} s caption
+☞ Anti Delete Messages (resends deleted messages while the bot was active)
+☞ SPAM messages (upto 9 at a time) - {$prefix} spam X message (X denotes the number between 1 - 9)
+☞ Delete bot side message: Reply message with .del
