@@ -1,4 +1,4 @@
-const { Client, LocalAuth, Chat } = require("whatsapp-web.js");
+const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const fs = require("fs");
 
@@ -63,11 +63,11 @@ client.on("message", async (msg) => {
 });
 
 //handle deleted messages
-  client.on("message_revoke_everyone", async (after, before) => {
-    if (before) {
-      client.sendMessage(before.from, before.body);
-    }
-  });
+client.on("message_revoke_everyone", async (after, before) => {
+  if (before) {
+    client.sendMessage(before.from, before.body);
+  }
+});
 
 //disconnection
 client.on("disconnected", (reason) => {
@@ -108,7 +108,7 @@ client.on("message", async (message) => {
     n = message.body.slice(6, 8);
     if (n < 10) {
       while (n--) {
-          client.sendMessage(message.from, message.body.slice(8));
+        client.sendMessage(message.from, message.body.slice(8));
       }
     } else {
       message.reply("Please enter single digit value");
@@ -125,4 +125,20 @@ client.on("message", async (message) => {
       }
     }
   }
+  //if kuru kuru
+  let cnt_kurukuru = 0;
+  if (message.body === "kuru kuru") {
+      cnt_kurukuru++;
+      const mediaPath = "./webp/kurukuru.webp";
+      const mediaData = MessageMedia.fromFilePath(mediaPath);
+      client.sendMessage(message.from, mediaData, {
+        sendMediaAsSticker: true
+      })
+      .then(() => {
+        client.sendMessage(message.from, "Kuru Rin~");
+      })
+      .catch((error) => {
+        console.error('Error sending sticker:', error);
+      });
+    }
 });
