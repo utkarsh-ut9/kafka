@@ -150,7 +150,7 @@ client.on("message", async (message) => {
     }
   }
   //easter eggs
-  if (message.body.includes("kuru kuru")) {
+  if (message.body.toLowerCase().includes("kuru kuru")) {
     //if the message body includes kuru kuru sends the sticker
     const mediaPath = "./webp/kurukuru.webp";
     const mediaData = MessageMedia.fromFilePath(mediaPath);
