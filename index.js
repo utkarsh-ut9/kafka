@@ -60,14 +60,19 @@ client.on("call", async (call) => {
 //logging the messages on console (not persistent)
 client.on("message", async (msg) => {
   console.log(msg.from, msg.body);
+  
 });
 
-//handle deleted messages
+//send deleted messages by other users
 client.on("message_revoke_everyone", async (after, before) => {
   if (before) {
-    client.sendMessage(before.from, before.body);
+    const deletedMessage = before.body;
+    // Send the deleted message along with the sender name
+    const reply = `Message Deletion Detected:\nMessage: ${deletedMessage}`;
+    client.sendMessage(before.from, reply);
   }
 });
+
 
 //disconnection
 client.on("disconnected", (reason) => {
