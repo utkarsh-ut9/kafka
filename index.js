@@ -75,22 +75,41 @@ client.on("disconnected", (reason) => {
 });
 
 client.on("message", async (message) => {
-  if (message.body == ".s") {
-    if (
-      message.type == "image" ||
-      message.type == "video" ||
-      message.type == "gif"
-    ) {
-      try {
-        const media = await message.downloadMedia();
-        client.sendMessage(message.from, media, {
-          sendMediaAsSticker: true,
-          stickerName: config.name, // Sticker Name = Edit in 'config/config.json'
-          stickerAuthor: config.author, // Sticker Author = Edit in 'config/config.json'
-        });
-      } catch {
-        message.reply("Failed!");
-      }
+  //send sticker using .s command
+  let isQuotedImg = false;
+  let isQuotedVid = false;
+  let isQuotedGif = false;
+
+  const quotedMsg = await message.getQuotedMessage();
+
+  if (quotedMsg && (quotedMsg.body === ".s" || message.body === ".s")) {
+    if (quotedMsg.type === "image") {
+      isQuotedImg = true;
+    } else if (quotedMsg.type === "video") {
+      isQuotedVid = true;
+    } else if (quotedMsg.type === "gif") {
+      isQuotedGif = true;
+    }
+  }
+
+  if (
+    (quotedMsg && (isQuotedGif || isQuotedImg || isQuotedVid)) ||
+    (message.body === ".s" &&
+      (message.type === "image" ||
+        message.type === "video" ||
+        message.type === "gif"))
+  ) {
+    try {
+      const media = quotedMsg
+        ? await quotedMsg.downloadMedia()
+        : await message.downloadMedia();
+      await client.sendMessage(message.from, media, {
+        sendMediaAsSticker: true,
+        stickerName: config.name, // Sticker Name = Edit in 'config/config.json'
+        stickerAuthor: config.author, // Sticker Author = Edit in 'config/config.json'
+      });
+    } catch {
+      await message.reply("Failed to send the sticker.");
     }
   }
 
@@ -126,7 +145,8 @@ client.on("message", async (message) => {
     }
   }
   //easter eggs
-  if (message.body.includes("kuru kuru")) { //if the message body includes kuru kuru sends the sticker
+  if (message.body.includes("kuru kuru")) {
+    //if the message body includes kuru kuru sends the sticker
     const mediaPath = "./webp/kurukuru.webp";
     const mediaData = MessageMedia.fromFilePath(mediaPath);
     client
