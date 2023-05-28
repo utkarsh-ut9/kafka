@@ -125,20 +125,19 @@ client.on("message", async (message) => {
       }
     }
   }
-  //if kuru kuru
-  let cnt_kurukuru = 0;
-  if (message.body === "kuru kuru") {
-      cnt_kurukuru++;
-      const mediaPath = "./webp/kurukuru.webp";
-      const mediaData = MessageMedia.fromFilePath(mediaPath);
-      client.sendMessage(message.from, mediaData, {
-        sendMediaAsSticker: true
+  //easter eggs
+  if (message.body.includes("kuru kuru")) { //if the message body includes kuru kuru sends the sticker
+    const mediaPath = "./webp/kurukuru.webp";
+    const mediaData = MessageMedia.fromFilePath(mediaPath);
+    client
+      .sendMessage(message.from, mediaData, {
+        sendMediaAsSticker: true,
       })
       .then(() => {
         client.sendMessage(message.from, "Kuru Rin~");
       })
       .catch((error) => {
-        console.error('Error sending sticker:', error);
+        console.error("Error sending sticker:", error);
       });
-    }
+  }
 });
