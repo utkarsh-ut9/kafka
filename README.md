@@ -33,7 +33,7 @@ Scan the QR code generated and your session will be saved (the bot uses MultiDev
 - List of commands can be obtained via .help command
 - Delete bot message for everyone using .del command
 - Spam a message upto 9 times at once using .spam command followed by an integer specifying how many times to send the message
-- Auto Call Rejection function (default: ON)
+- Auto Call Rejection function (default: ON) 
 - Some easter eggs
 - Multiple features need to be implemented in future
 
