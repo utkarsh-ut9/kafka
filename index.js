@@ -60,7 +60,6 @@ client.on("call", async (call) => {
 //logging the messages on console (not persistent)
 client.on("message", async (msg) => {
   console.log(msg.from, msg.body);
-  
 });
 
 //send deleted messages by other users
@@ -72,7 +71,6 @@ client.on("message_revoke_everyone", async (after, before) => {
     client.sendMessage(before.from, reply);
   }
 });
-
 
 //disconnection
 client.on("disconnected", (reason) => {
@@ -150,19 +148,21 @@ client.on("message", async (message) => {
     }
   }
   //easter eggs
-  if (message.body.toLowerCase().includes("kuru kuru")) {
-    //if the message body includes kuru kuru sends the sticker
-    const mediaPath = "./webp/kurukuru.webp";
-    const mediaData = MessageMedia.fromFilePath(mediaPath);
-    client
-      .sendMessage(message.from, mediaData, {
-        sendMediaAsSticker: true,
-      })
-      .then(() => {
-        client.sendMessage(message.from, "Kuru Rin~");
-      })
-      .catch((error) => {
-        console.error("Error sending sticker:", error);
-      });
+   const fileName = message.body.toLowerCase();
+
+  if (message.body.toLowerCase().includes(fileName)) {
+    // Check if the webp file exists
+    const filePath = `./webp/${fileName}.webp`;
+    if (fs.existsSync(filePath)) {
+      const mediaPath = filePath;
+      const mediaData = MessageMedia.fromFilePath(mediaPath);
+      client
+        .sendMessage(message.from, mediaData, {
+          sendMediaAsSticker: true,
+        })
+        .catch((error) => {
+          console.error("Error sending sticker:", error);
+        });
+    }
   }
 });
