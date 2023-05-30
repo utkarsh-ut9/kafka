@@ -1,8 +1,8 @@
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const fs = require("fs");
-const path = require('path');
-const fsp = require('fs').promises;
+const path = require("path");
+const fsp = require("fs").promises;
 
 const client = new Client({
   restartOnAuthFail: true,
@@ -59,31 +59,35 @@ client.on("call", async (call) => {
   );
 });
 
-let revokeON = false //this is for message_revoke_everyone function
+let revokeON = false; //this is for message_revoke_everyone function
 
 //logging the messages on console (not persistent)
 client.on("message", async (msg) => {
   console.log(msg.from, msg.body);
-  if (msg.body === '.revokeON'){
-    revokeON = true
-    client.sendMessage(msg.from, "The bot will resend the deleted messages now.")
-  } else if (msg.body === '.revokeOFF'){
-    revokeON = false
-    client.sendMessage(msg.from, "The bot will not send the deleted messages now.")
+  if (msg.body === ".revokeON") {
+    revokeON = true;
+    client.sendMessage(
+      msg.from,
+      "The bot will resend the deleted messages now."
+    );
+  } else if (msg.body === ".revokeOFF") {
+    revokeON = false;
+    client.sendMessage(
+      msg.from,
+      "The bot will not send the deleted messages now."
+    );
   }
 });
 
 //send deleted messages by other users
-
-  client.on("message_revoke_everyone", async (after, before) => {
-    if (revokeON && before) {
-      const deletedMessage = before.body;
-      // Send the deleted message along with the sender name
-      const reply = `Message Deletion Detected:\nMessage: ${deletedMessage}`;
-      client.sendMessage(before.from, reply);
-    }
-  });
-
+client.on("message_revoke_everyone", async (after, before) => {
+  if (revokeON && before) {
+    const deletedMessage = before.body;
+    // Send the deleted message along with the sender name
+    const reply = `Message Deletion Detected:\nMessage: ${deletedMessage}`;
+    client.sendMessage(before.from, reply);
+  }
+});
 
 //disconnection
 client.on("disconnected", (reason) => {
@@ -162,14 +166,18 @@ client.on("message", async (message) => {
   }
   //easter eggs
 
-  if (message.body === '.eastereggs') {
+  if (message.body === ".eastereggs") {
     try {
-      const folderPath = './webp'; // Path to the folder
+      const folderPath = "./webp"; // Path to the folder
       const files = await fsp.readdir(folderPath);
       const fileNames = files.map((file) => path.parse(file).name);
-      await client.sendMessage(message.from, `Following are some easter eggs. Try them out!\n\n`+fileNames.join('\n'));
+      await client.sendMessage(
+        message.from,
+        `Following are some easter eggs. Try them out!\n\n` +
+          fileNames.join("\n")
+      );
     } catch (err) {
-      console.error('Error reading folder:', err);
+      console.error("Error reading folder:", err);
     }
   }
 
