@@ -148,11 +148,13 @@ client.on("message", async (message) => {
     }
   }
   //easter eggs
-   const fileName = message.body.toLowerCase();
-
-  if (message.body.toLowerCase().includes(fileName)) {
+  const folderPath = "./webp/";
+  // Get the filename from the message body
+  const fileName = message.body.toLowerCase();
+  // Check if the message body includes the filename
+  if (message.body.includes(fileName.toString())) {
     // Check if the webp file exists
-    const filePath = `./webp/${fileName}.webp`;
+    const filePath = `${folderPath}${fileName}.webp`;
     if (fs.existsSync(filePath)) {
       const mediaPath = filePath;
       const mediaData = MessageMedia.fromFilePath(mediaPath);
