@@ -1,6 +1,8 @@
 const { Client, LocalAuth, MessageMedia } = require("whatsapp-web.js");
 const qrcode = require("qrcode-terminal");
 const fs = require("fs");
+const path = require('path');
+const fsp = require('fs').promises;
 
 const client = new Client({
   restartOnAuthFail: true,
@@ -148,11 +150,22 @@ client.on("message", async (message) => {
     }
   }
   //easter eggs
+
+  if (message.body === '.eastereggs') {
+    try {
+      const folderPath = './webp'; // Path to the folder
+      const files = await fsp.readdir(folderPath);
+      const fileNames = files.map((file) => path.parse(file).name);
+      await client.sendMessage(message.from, `Following are some easter eggs. Try them out!\n\n`+fileNames.join('\n'));
+    } catch (err) {
+      console.error('Error reading folder:', err);
+    }
+  }
+
   const folderPath = "./webp/";
   // Get the filename from the message body
   const fileName = message.body.toLowerCase();
-  // Check if the message body includes the filename
-  if (message.body.includes(fileName.toString())) {
+  if (fileName) {
     // Check if the webp file exists
     const filePath = `${folderPath}${fileName}.webp`;
     if (fs.existsSync(filePath)) {
