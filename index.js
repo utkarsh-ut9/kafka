@@ -3,6 +3,7 @@ const qrcode = require("qrcode-terminal");
 const fs = require("fs");
 const path = require("path");
 const fsp = require("fs").promises;
+const axios = require("axios");
 
 const client = new Client({
   restartOnAuthFail: true,
@@ -190,13 +191,82 @@ client.on("message", async (message) => {
     if (fs.existsSync(filePath)) {
       const mediaPath = filePath;
       const mediaData = MessageMedia.fromFilePath(mediaPath);
-      client
+      await client
         .sendMessage(message.from, mediaData, {
           sendMediaAsSticker: true,
+
+          stickerName: config.name, // Sticker Name = Edit in 'config/config.json'
+          stickerAuthor: config.author, // Sticker Author = Edit in 'config/config.json'
         })
         .catch((error) => {
           console.error("Error sending sticker:", error);
         });
     }
+  }
+  //search sticker using giphy
+  if (message.body.toLowerCase().startsWith(".ss")) {
+    const stickerApiUrl = "https://api.giphy.com/v1/stickers/search";
+    const apiKey = config.giphyAPI;
+    const query = message.body.toLowerCase().slice(4);
+    console.log(`query=>`, query);
+
+    // Make a request to the GIPHY API to search for stickers
+    axios
+      .get(stickerApiUrl, {
+        params: {
+          api_key: apiKey,
+          q: query,
+        },
+      })
+      .then((response) => {
+        // Check if any stickers were found
+        if (response.data.data.length > 0) {
+          // Get the first sticker from the search results
+          const stickerUrl = response.data.data[0].images.original.webp;
+
+          // Download the sticker
+          const stickerPath = "./webp/searchsticker.webp";
+          downloadSticker(stickerUrl, stickerPath)
+            .then(() => {
+              // Send the sticker on WhatsApp
+              const mediaPath = stickerPath;
+              const mediaData = MessageMedia.fromFilePath(mediaPath);
+              client
+                .sendMessage(message.from, mediaData, {
+                  sendMediaAsSticker: true,
+                })
+                .catch((error) => {
+                  console.error("Error sending sticker:", error);
+                });
+            })
+            .catch((error) => {
+              console.error("Error downloading sticker:", error);
+            });
+        } else {
+          message.reply(`query=>` + query + " No stickers found.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error searching for stickers:", error);
+      });
+  }
+
+  async function downloadSticker(url, filename) {
+    const response = await axios({
+      url,
+      responseType: "stream",
+    });
+
+    response.data.pipe(fs.createWriteStream(filename));
+
+    return new Promise((resolve, reject) => {
+      response.data.on("end", () => {
+        resolve();
+      });
+
+      response.data.on("error", (err) => {
+        reject(err);
+      });
+    });
   }
 });

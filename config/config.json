@@ -5,6 +5,7 @@
     "groups": true,
     "ownerNum": "xxxxxxxxxxxx@c.us",
     "startupMsg": "Kafka is active now~",
-    "prefix": "."
+    "prefix": ".",
+    "giphyAPI": ""
 }
 
