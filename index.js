@@ -194,7 +194,6 @@ client.on("message", async (message) => {
       await client
         .sendMessage(message.from, mediaData, {
           sendMediaAsSticker: true,
-
           stickerName: config.name, // Sticker Name = Edit in 'config/config.json'
           stickerAuthor: config.author, // Sticker Author = Edit in 'config/config.json'
         })
@@ -234,6 +233,8 @@ client.on("message", async (message) => {
               client
                 .sendMessage(message.from, mediaData, {
                   sendMediaAsSticker: true,
+                  stickerName: config.name, // Sticker Name = Edit in 'config/config.json'
+                  stickerAuthor: config.author, // Sticker Author = Edit in 'config/config.json'
                 })
                 .catch((error) => {
                   console.error("Error sending sticker:", error);
