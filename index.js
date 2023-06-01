@@ -17,6 +17,7 @@ const client = new Client({
 
 const config = require("./config/config.json");
 const { isUint16Array } = require("util/types");
+const { off } = require("process");
 
 client.initialize();
 //generate QR code
@@ -43,25 +44,9 @@ client.on("ready", () => {
   console.log("Started!");
   // client.sendMessage(config.ownerNum, config.startupMsg); //uncomment this line after changing your owner number in config.json file
 });
-//handle calls
-let rejectCalls = true; //change to false if  you don't want to reject calls automatically
-client.on("call", async (call) => {
-  console.log("Call received, rejecting. GOTO script to disable", call);
-  if (rejectCalls) await call.reject();
-  await client.sendMessage(
-    call.from,
-    `[${call.fromMe ? "Outgoing" : "Incoming"}] Phone call from ${
-      call.from
-    }, type ${call.isGroup ? "group" : ""} ${
-      call.isVideo ? "video" : "audio"
-    } call. ${
-      rejectCalls ? "This call was automatically rejected by the script." : ""
-    }`
-  );
-});
 
 let revokeON = false; //this is for message_revoke_everyone function
-
+let rejectCalls = true;
 //logging the messages on console (not persistent)
 client.on("message", async (msg) => {
   console.log(msg.from, msg.body);
@@ -78,6 +63,35 @@ client.on("message", async (msg) => {
       "The bot will not send the deleted messages now."
     );
   }
+  if (msg.body === '.rejectCallsON') {
+    rejectCalls = true;
+    client.sendMessage(
+      msg.from,
+      "The bot will reject calls automatically now."
+    );
+  }
+  else if (msg.body === '.rejectCallsOFF') {
+    rejectCalls = false;
+    client.sendMessage(
+      msg.from,
+      "The bot will not reject calls automatically now."
+    );
+  }
+});
+
+client.on("call", async (call) => {
+  console.log("Call received, rejecting. GOTO script to disable", call);
+  if (rejectCalls) await call.reject();
+  await client.sendMessage(
+    call.from,
+    `[${call.fromMe ? "Outgoing" : "Incoming"}] Phone call from ${
+      call.from
+    }, type ${call.isGroup ? "group" : ""} ${
+      call.isVideo ? "video" : "audio"
+    } call. ${
+      rejectCalls ? "This call was automatically rejected by the script." : ""
+    }`
+  );
 });
 
 //send deleted messages by other users
@@ -145,15 +159,16 @@ client.on("message", async (message) => {
   //spam message
   if (message.body.startsWith(".spam ")) {
     // Replies with the same message n number of times
-    n = message.body.slice(6, 8);
-    if (n < 10) {
+    let n = parseInt(message.body.slice(6, 8));
+    if (!isNaN(n) && n < 10) {
       while (n--) {
         client.sendMessage(message.from, message.body.slice(8));
       }
     } else {
-      message.reply("Please enter single digit value");
+      message.reply("Please enter a single-digit value.");
     }
   }
+
   //delete messages from bot side
   if (message.body === ".del") {
     if (message.hasQuotedMsg) {
@@ -207,6 +222,11 @@ client.on("message", async (message) => {
     const stickerApiUrl = "https://api.giphy.com/v1/stickers/search";
     const apiKey = config.giphyAPI;
     const query = message.body.toLowerCase().slice(4);
+    const ratingX = 'pg-13';
+    const limitX = 25;
+    const offsetX= 0;
+    const language = 'en'
+
     console.log(`query=>`, query);
 
     // Make a request to the GIPHY API to search for stickers
@@ -215,6 +235,10 @@ client.on("message", async (message) => {
         params: {
           api_key: apiKey,
           q: query,
+          limit: limitX,
+          offset: offsetX,
+          rating: ratingX,
+          lang: language
         },
       })
       .then((response) => {
@@ -244,7 +268,7 @@ client.on("message", async (message) => {
               console.error("Error downloading sticker:", error);
             });
         } else {
-          message.reply(`query=>` + query + " No stickers found.");
+          message.reply(`query=>` + query + "\nNo stickers found.");
         }
       })
       .catch((error) => {

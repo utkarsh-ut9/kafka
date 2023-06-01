@@ -2,4 +2,6 @@ node_modules
 
 .wwebjs_auth
 
-config
+config/config.json
+
+webp/searchsticker.webp
