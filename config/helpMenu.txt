@@ -4,26 +4,13 @@
 
 prefix -> .
 
-+-----------------+-------------------------------------------------------------------------------------+
-| COMMAND         | DESCRIPTION                                                                         |
-+-----------------+-------------------------------------------------------------------------------------+
-| .s              | Image/GIF to Sticker                                                                |
-+-----------------+-------------------------------------------------------------------------------------+
-| .del            | Delete bot-side messages for everyone                                               |
-+-----------------+-------------------------------------------------------------------------------------+
-| .ss query       | Search sticker based on query using GIPHY API                                       |
-+-----------------+-------------------------------------------------------------------------------------+
-| .revokeON       | Turn on anti-delete mode i.e, the bot resends the deleted messages by users in chat |
-+-----------------+-------------------------------------------------------------------------------------+
-| .revokeOFF      | Turn off anti-delete mode                                                           |
-+-----------------+-------------------------------------------------------------------------------------+
-| .spam n message | Repeatedly sends the message for n number of times (max n = 9)                      |
-+-----------------+-------------------------------------------------------------------------------------+
-| .rejectCallsON  | Reject calls to bot number automatically                                            |
-+-----------------+-------------------------------------------------------------------------------------+
-| .rejectCallsOFF | Turn off call rejection                                                             |
-+-----------------+-------------------------------------------------------------------------------------+
-| .help           | Shows the list of commands and their usages                                         |
-+-----------------+-------------------------------------------------------------------------------------+
-| .eastereggs     | Some eastereggs included in the project                                             |
-+-----------------+-------------------------------------------------------------------------------------+
+COMMAND ~ DESCRIPTION                                                                         
+.s : Image/GIF to Sticker                                                               
+.del : Delete bot-side messages for everyone                                               
+.ss query : Search sticker based on query using GIPHY API                                       
+.revokeON : Turn on anti-delete mode i.e, the bot resends the deleted messages by users in chat                                    
+.revokeOFF : Turn off anti-delete mode                                                                          
+.spam n message : Repeatedly sends the message for n number of times (max n = 9)                      
+.rejectCallsON  : Reject calls to bot number automatically                                                                                             
+.rejectCallsOFF : Turn off call rejection                                                                                                                       
+.eastereggs : Some eastereggs included in the project                                                            
