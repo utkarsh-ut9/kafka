@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const fsp = require("fs").promises;
 const axios = require("axios");
+const canvas = require("./canvas.js");
 
 const client = new Client({
   restartOnAuthFail: true,
@@ -16,8 +17,6 @@ const client = new Client({
 });
 
 const config = require("./config/config.json");
-const { isUint16Array } = require("util/types");
-const { off } = require("process");
 
 client.initialize();
 //generate QR code
@@ -63,14 +62,13 @@ client.on("message", async (msg) => {
       "The bot will not send the deleted messages now."
     );
   }
-  if (msg.body === '.rejectCallsON') {
+  if (msg.body === ".rejectCallsON") {
     rejectCalls = true;
     client.sendMessage(
       msg.from,
       "The bot will reject calls automatically now."
     );
-  }
-  else if (msg.body === '.rejectCallsOFF') {
+  } else if (msg.body === ".rejectCallsOFF") {
     rejectCalls = false;
     client.sendMessage(
       msg.from,
@@ -219,81 +217,83 @@ client.on("message", async (message) => {
   }
   //search sticker using giphy
   if (message.body.toLowerCase().startsWith(".ss")) {
-  const stickerApiUrl = "https://api.giphy.com/v1/stickers/search";
-  const apiKey = config.giphyAPI;
-  const query = message.body.toLowerCase().slice(4);
-  const ratingX = 'pg-13';
-  const limitX = 25;
-  const offsetX= 0;
-  const language = 'en';
+    const stickerApiUrl = "https://api.giphy.com/v1/stickers/search";
+    const apiKey = config.giphyAPI;
+    const query = message.body.toLowerCase().slice(4);
+    const ratingX = "pg-13";
+    const limitX = 25;
+    const offsetX = 0;
+    const language = "en";
 
-  console.log(`query =>`, query);
+    console.log(`query =>`, query);
 
-  // Make a request to the GIPHY API to search for stickers
-  axios
-    .get(stickerApiUrl, {
-      params: {
-        api_key: apiKey,
-        q: query,
-        limit: limitX,
-        offset: offsetX,
-        rating: ratingX,
-        lang: language
-      },
-    })
-    .then((response) => {
-      // Check if any stickers were found
-      if (response.data.data.length > 0) {
-        // Get a random sticker from the search results
-        const randomIndex = Math.floor(Math.random() * response.data.data.length);
-        const stickerUrl = response.data.data[randomIndex].images.original.webp;
+    // Make a request to the GIPHY API to search for stickers
+    axios
+      .get(stickerApiUrl, {
+        params: {
+          api_key: apiKey,
+          q: query,
+          limit: limitX,
+          offset: offsetX,
+          rating: ratingX,
+          lang: language,
+        },
+      })
+      .then((response) => {
+        // Check if any stickers were found
+        if (response.data.data.length > 0) {
+          // Get a random sticker from the search results
+          const randomIndex = Math.floor(
+            Math.random() * response.data.data.length
+          );
+          const stickerUrl =
+            response.data.data[randomIndex].images.original.webp;
 
-        // Download the sticker
-        const stickerPath = "./webp/searchsticker.webp";
-        downloadSticker(stickerUrl, stickerPath)
-          .then(() => {
-            // Send the sticker on WhatsApp
-            const mediaPath = stickerPath;
-            const mediaData = MessageMedia.fromFilePath(mediaPath);
-            client
-              .sendMessage(message.from, mediaData, {
-                sendMediaAsSticker: true,
-                stickerName: config.name, // Sticker Name = Edit in 'config/config.json'
-                stickerAuthor: config.author, // Sticker Author = Edit in 'config/config.json'
-              })
-              .catch((error) => {
-                console.error("Error sending sticker:", error);
-              });
-          })
-          .catch((error) => {
-            console.error("Error downloading sticker:", error);
-          });
-      } else {
-        message.reply(`query => ${query}\nNo stickers found.`);
-      }
-    })
-    .catch((error) => {
-      console.error("Error searching for stickers:", error);
-    });
-}
+          // Download the sticker
+          const stickerPath = "./webp/searchsticker.webp";
+          downloadSticker(stickerUrl, stickerPath)
+            .then(() => {
+              // Send the sticker on WhatsApp
+              const mediaPath = stickerPath;
+              const mediaData = MessageMedia.fromFilePath(mediaPath);
+              client
+                .sendMessage(message.from, mediaData, {
+                  sendMediaAsSticker: true,
+                  stickerName: config.name, // Sticker Name = Edit in 'config/config.json'
+                  stickerAuthor: config.author, // Sticker Author = Edit in 'config/config.json'
+                })
+                .catch((error) => {
+                  console.error("Error sending sticker:", error);
+                });
+            })
+            .catch((error) => {
+              console.error("Error downloading sticker:", error);
+            });
+        } else {
+          message.reply(`query => ${query}\nNo stickers found.`);
+        }
+      })
+      .catch((error) => {
+        console.error("Error searching for stickers:", error);
+      });
+  }
 
-async function downloadSticker(url, filename) {
-  const response = await axios({
-    url,
-    responseType: "stream",
-  });
-
-  response.data.pipe(fs.createWriteStream(filename));
-
-  return new Promise((resolve, reject) => {
-    response.data.on("end", () => {
-      resolve();
+  async function downloadSticker(url, filename) {
+    const response = await axios({
+      url,
+      responseType: "stream",
     });
 
-    response.data.on("error", (err) => {
-      reject(err);
-    });
-  });
-}
+    response.data.pipe(fs.createWriteStream(filename));
 
+    return new Promise((resolve, reject) => {
+      response.data.on("end", () => {
+        resolve();
+      });
+
+      response.data.on("error", (err) => {
+        reject(err);
+      });
+    });
+  }
 });
