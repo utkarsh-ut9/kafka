@@ -4,7 +4,6 @@ const fs = require("fs");
 const path = require("path");
 const fsp = require("fs").promises;
 const axios = require("axios");
-const canvas = require("./canvas.js");
 
 const client = new Client({
   restartOnAuthFail: true,
